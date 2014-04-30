@@ -1,0 +1,16 @@
+/*
+ * Version 1.0  2001-04-27
+ *	Created the Makefile and configure scripts
+ *
+ * Version 0.9  1999-08-23
+ *	Major code improvements
+ *	AM signal calculation improvements
+ *	X11 version draws the picture on screen faster now
+ *	SVGA version displays supported resolutions
+ *	Added PGM (Portable Bitmap) picture file support
+ *	Added square waves support
+ *
+ * Version 0.8  1999-08-05
+ *	Initial public release.
+ *
+ */

@@ -1,0 +1,47 @@
+#
+#  configure.in
+#
+#  Author: Pekka Riikonen <priikone@poseidon.pspt.fi>
+#
+#  Copyright (C) 2001 Pekka Riikonen
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+
+AC_INIT(common.c)
+
+# Compiler settings
+CFLAGS="-Wall $CFLAGS"
+
+AM_INIT_AUTOMAKE(tempest-AM, 1.0)
+AC_PREREQ(2.3)
+
+AC_PROG_CC
+AC_C_INLINE
+AC_C_CONST
+AC_ARG_PROGRAM
+
+AC_PROG_LN_S
+AC_SUBST(LN_S)
+
+# Program checking
+AC_PROG_INSTALL
+AC_PROG_RANLIB
+AC_PROG_MAKE_SET
+
+# Header checking
+AC_HEADER_STDC
+AC_HEADER_TIME
+AC_HEADER_STAT
+
+AC_CONFIG_SUBDIRS(g2-0.40)
+
+AC_OUTPUT(Makefile)

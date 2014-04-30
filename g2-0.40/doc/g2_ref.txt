@@ -1,0 +1,705 @@
+                            g2 - graphic library
+
+                                Version 0.40
+
+                      (C) 1999 Lj. Milanovic, H. Wagner
+
+          To check for news and latest version see the g2-home page
+            (http://www.ap.univie.ac.at/users/ljubo/g2/g2.shtml)
+----------------------------------------------------------------------------
+
+Contents
+
+License Notice
+
+Introduction
+
+Getting Started
+
+   * Installation
+   * A simple example
+   * More examples
+   * Fortran interface
+   * Perl interface
+
+g2 Function Reference
+
+   * Device Functions
+   * Drawing Functions
+        o General
+        o Pixels and QuasiPixels
+        o Lines
+        o Triangles, Rectangles, Polygons
+        o Circles, Ellipses, Arcs
+        o Text
+        o Images
+
+   * Style Functions
+        o Colors
+        o Line Styles
+        o Text
+
+g2 Device Support
+
+Developing new devices
+
+Known Bugs and ToDo
+
+Appendix
+
+   * PostScript paper sizes
+
+----------------------------------------------------------------------------
+License Notice
+
+This program is covered with GNU General Public License (GPL) and  not with
+GNU Library General Public License (LGPL)! It is allowed only for GPL
+programs to use (static/dynamic linkage or any other using of code) the g2
+library. If you want to develop a non GPL application and want to use g2
+please contact the authors.
+
+See the  GNU General Public License (GPL) for details.
+
+Introduction
+
+What is g2 ?
+
+Short version (if you are in hurry):
+
+   * 2D graphic library
+   * Simple to use
+   * Supports several types of output devices (currently X11, GIF,
+     PostScript and WinNT)
+   * Concept allows easy implementation of new device types
+   * Virtual devices allow to send output simultaneously to several devices
+   * User definable coordinate system
+   * Written in ANSI-C
+   * Tested under Digital Unix, AIX, Linux, VMS and Windows NT
+   * Perl support
+   * Fortran interface
+
+Long version:
+
+g2 is a simple to use graphics library for 2D graphical applications written
+in Ansi-C. This library provides a comprehensive set of functions for
+simultaneous generation of graphical output on different types of devices.
+Presently, following devices are currently supported by g2: X11, GIF,
+PostScript (xfig is in developement).
+One major feature of the g2_library is the concept of virtual devices. An
+arbitrary number of physical devices (such as GIF, or X11) can be grouped to
+create a so-called virtual device. Commands sent to such a virtual devices
+will automatically issued to all attached physical devices. This allows for
+example simultaneous output to a GIF file and a Postscript file. A virtual
+device in turn can be attached to another virtual device, allowing to
+construct trees of devices.
+Virtual devices can also be useful when using different user-coordinate
+systems. E.g. one X11 window showing an overview of a graphical output, and
+a second window showing  a zoom of a more detailed area of the graphic.
+Drawing in both windows is performed by one single command to the virtual
+device.
+
+                                   /-------> GIF:   g2_attach(id_GIF,..
+            -----------------------
+g2_plot---> | Virtual device: id |--------> X11:   g2_attach(id_X11,...
+            -----------------------
+                                   \-------> PS:    g2_attach(id_PS,...
+
+If you don't need or like the concept of virtual devices, simply ignore it.
+
+----------------------------------------------------------------------------
+Getting Started
+
+Preinstallation tasks:
+
+   * GIF support
+
+     g2 uses the gd library by Thomas Boutell to generate GIF files.
+     This package is freeware (however not GPL) and can be downloaded
+     at http://www.boutell.com/gd/.
+     Version 1.3 uses a non-LZW-based GIF compression code to avoid the
+     patent issues associated with the LZW method.
+     Linux users might prefer to install a pre-compiled gd rpm package
+     which should be available at your local RedHat mirrorsite.
+     NT users should install the gd source package in a subdirectory
+     named "gd" which should be located in the same directory as the g2
+     subdirectory (but not in the g2 directory itself). Otherwise file
+     locations for gd must be modified in the g2 project workspace.
+     Unix and VMS users will have to build and install gd according to
+     the instructions found in the gd distribution.
+
+Installation
+
+LINUX
+
+   * Either install RPM packet with binaries, or compile as described in the
+     UNIX section
+
+UNIX
+
+   * Extract package with gzip -dc g2-xxxx.tar.gz | tar xvf -
+   * Run './configure'
+   * Optionally run 'make depend'
+   * Run 'make'
+   * Run 'make install' or copy libg2.a and g2.h, g2_X11.h, g2_GIF.h, anf
+     g2_PS.h to the default locations for library and include files.
+   * Optional: run 'make demo' to compile demo applications
+
+WINDOWS NT
+
+   * Extract package using either the .tar.gz or the .zip distribution
+   * MS Visual C++ users can build both library and demos with the supplied
+     project file: g2.dsw (To obtain an icon and use menu functions you must
+     also build the g2res project in g2.dsw)
+   * users of gcc or other commandline based compilers with make support
+     continue as in Unix example
+   * It is also possible to compile g2 on winNT/95 using the free cygwin32
+     library and a X-windows library for windows. Theoretically it should be
+     possible to support both X-windows and native NT/95 windows at the same
+     time.
+
+PERL
+
+   * Change to directory g2_perl
+   * Perform following steps
+        o perl Makefile.PL
+        o make
+        o make test
+        o make install
+   * See the perl interface section for more information
+
+VMS
+
+   * Try to extract either the tar.gz or the zip distribution (whatever
+     is easier for you)
+   * type mms to compile library (descrip.mms file is suplied)
+   * run mms in demo directory to compile demo applications
+
+A simple example
+
+The following example is a minimal application. It  draws a rectangle in a
+postscript file.
+
+
+
+     #include <g2.h>
+     #include <g2_PS.h>
+
+     main()
+     {
+     int id;
+     id = g2_open_PS("rect.ps", g2_A4, g2_PS_land);
+     g2_rectangle(id,20,20,150,150);
+     g2_close(id);
+     }
+
+1.) Always include <g2.h>. Additionally include header files for all types
+of devices you want to use.
+
+2.) Open devices using g2_open functions. The open function returns a device
+id of type int, which you need to refer to the device.
+
+3.) use g2 functions for drawing, changing drawing styles, or doing other
+stuff
+
+4.) call g2_close to close device
+
+
+You want to draw a GIF file instead of a PostScript file ?
+
+replace the PS header file with
+
+#include <g2_GIF.h>
+
+and replace the g2_open_PS function call with
+
+id = g2_open_GIF("rect.gif",300,200);
+
+You want to draw to a GIF file and a PostScript file with one plot command ?
+
+Here we use the concept of virtual devices. Open a GIF and PostScript
+device, then open a virtual device and attach both the GIF and PostScript
+device to the virtual device. Plot commands to the virtual device will be
+issued to both GIF and PostScript device. You can attach and detatch further
+devices at any time.
+
+#include <g2.h>
+#include <g2_PS.h>
+#include <g2_GIF.h>
+
+main()
+{
+int id_PS,id_GIF,id;
+
+id_PS  = g2_open_PS("rect.ps", g2_A4, g2_PS_land);
+id_GIF = g2_open_GIF("rect.gif",300,200);
+id     = g2_open_vd();
+
+g2_attach(id,id_PS);
+g2_attach(id,id_GIF);
+
+g2_rectangle(id,20,20,150,150);
+g2_circle(id,50,60,100);
+
+g2_close(id);
+}
+
+Note: closing a virtual device automatically closes all attached devices.
+
+More examples
+
+More examples showing the usage of different user coordinate systems,
+multiple virtual devices, etc. can be found in the distribution (demo
+directory).
+
+
+Fortran interface
+
+The Fortran interface for g2 is currently tested for Linux and Digital
+Unix/OSF.  Function names for Fortran are the same as in C, however
+following differences exist:
+
+   * all variables including device IDs are of type REAL
+   * void functions are implemented as subroutines and must be called with
+     CALL
+   * constants defined by #define in C (e.g.  g2_A4) do not work. Get
+     corresponding values from the apropriate header files.
+
+A short Fortran example:
+
+        program demo
+        real d,color
+        d=g2_open_PS('demo_f.ps', 4.0, 1.0)
+        call g2_plot(d, 50.0, 50.0)
+        call g2_string(d, 25.0, 75.0, 'TEST ')
+        color=g2_ink(d, 1.0, 0.0, 0.0)
+        write (6,*) color
+        call g2_pen(d, color)
+        call g2_circle(d, 20.0, 20.0, 10.0)
+        call g2_flush(d)
+        call g2_close(d)
+        stop
+        end
+
+Perl interface
+
+The perl interface for g2 is currently tested for Linux and Digital
+Unix/OSF.  Function names in perl are the same as in C, however the device
+itself is implemented object orientated, i.e. the device argument is ommited
+in all functions.
+E.g., following simple perl script:
+
+
+          use G2;
+
+          $d = newX11 G2::Device(100,100);
+          $d->circle(10, 10, 20);
+          $d->string(20, 40, "Hello World");
+
+          print "\nDone.\n[Enter]\n";
+          getc(STDIN);
+
+          $d->close()
+
+The creator functions are newX11, newGIF, newPS, etc. and accept the same
+arguments as the open functions in the C version.
+See the perl documentation (perldoc G2) for more details and the test.pl
+script for a more extensive example.
+
+----------------------------------------------------------------------------
+
+g2 Function Reference
+
+Device Functions
+
+     int g2_open_X11(int width, int height)
+
+          open an X11 window
+          width,height: width and height of X11 window in pixels
+          returns : device id of new X11 device.
+
+     int g2_open_X11X(int width, int height, int x, int y, char
+     *window_name, char *icon_name, char *icon_data, int icon_width,
+     int icon_height);
+
+          open an X11 window supporting additional features as
+          icons and window title.
+          width,height: width and height of X11 window in pixels
+          x,y: position of window on screen
+          window_name: \0 terminated string of name of window
+          icon_name:
+          icon_data:
+          icon_width,icon_height:
+          returns : device id of new X11 device.
+
+     int g2_open_PS(const char *file_name,   enum g2_PS_paper paper,
+     enum g2_PS_orientation orientation)
+
+          open a new PostScript device
+          file_name: name of PostScript file
+          paper: Paper size (e.g. g2_A4, g2_Letter). See
+          PostScript paper sizes for a full list of supported
+          sizes.
+          orientation: paper orientation. Either g2_PS_land for
+          landscape or g2_PS_port  for  portrait
+          returns : device id of new PostScript device.
+
+     int g2_open_win32(int width, int height, const char *name, int
+     type)
+
+          open a new Win32 device
+          width,height: width and height of GIF image in pixels
+          name: depending on the value of "type" (see below)
+          either window title or name of the metafile.
+          type: Defines the output type of win32 device:
+              0:    output to a window
+              1:    output to an enhanced metafile (EMF)
+          returns : device id of new win32 device
+
+     int g2_open_GIF(int width, int height, const char *filename)
+
+          open a new GIF device
+          width,height: width and height of GIF image in pixels
+          filename: name of GIF file.
+          returns : device id of new GIF device
+
+     int g2_open_vd(void)
+
+          open a new virtual device
+          returns : device id of new virtual device.
+
+        void g2_attach(int vd_dev, int dev)
+           attach a device to an existing virtual device
+                vd_dev : device id of virtual device to attach to.
+           dev : device id of device to attach, this can be either a
+physical or a virtual device.
+
+        void g2_detach(int vd_dev, int dev)
+                detach a device attached to a virtual device
+                vd_dev : device id of virtual device to detach from.
+                dev : device id of device to detach.
+
+Device Functions
+
+     void g2_close(int dev)
+             close device
+             dev: device ID of device to close
+
+
+     void g2_set_auto_flush(int dev, int on_off);
+          switch on/off autoflush for specified device dev
+          on/off: 0 = off, 1 = on
+     void g2_set_coordinate_system(int dev, double x_origin, double
+     y_origin, double x_mul, double y_mul)
+          set origin and scaling for the device dev
+          x,y: coordinates of origin
+          x_mul,y_mul: scaling factor for x- and y axis
+     void g2_flush(int dev)
+          flush device dev
+     void g2_save(int dev)
+          Applies to file devices only. Flush, save and close files of
+          device dev. The device remains open. Use to generate valid
+          intermediate output files.
+     void g2_ld()
+          Returns id of last accessed device (macro G2LD is defined as
+          g2_ld() )
+
+----------------------------------------------------------------------------
+
+Drawing Functions
+
+General
+
+     void g2_clear(int dev)
+          Clear device dev
+     void g2_set_background(int dev, int color)
+          Set background color for device dev
+          color: index of colorpalette for new background color
+     void g2_move(int dev, double x, double y)
+          set new current point for device dev
+          x,y: coordinates of new current point
+     void g2_move_r(int dev, double dx, double dy)
+          set new current point relative to current point for device dev
+          x,y: relative coordinates of new current point
+
+Pixels and QuasiPixels
+
+     void g2_plot(int dev, double x, double y)
+
+     void g2_plot_r(int dev, double dx, double dy)
+
+     void g2_set_QP(int dev, double d, enum QPshape shape);
+
+     void g2_plot_QP(int dev, double x, double y);
+
+Lines
+
+     void g2_line(int dev, double x1, double y1, double x2, double y2)
+             Draw a line on device dev
+             x1,y1: starting point
+             x2,y2: ending point
+
+     void g2_line_to(int dev, double x, double y)
+             Draw a line from current position on device dev
+             x,y: ending point
+
+
+     void g2_line_r(int dev, double dx, double dy)
+          Draw a line relative to the current position on device dev
+          dx,dy: relative coordinates of the ending point
+     void g2_poly_line(int dev, int N_pt, double *points)
+          Draw a polyline with N_pt corners on device dev
+          N_pt: Number of corners
+          points: Array of point coordinates (x1,y1,x2,y2,x3,y3 ....)
+
+Triangles, Rectangles, Polygons
+
+     void g2_triangle(int dev, double x1, double y1, double x2, double y2,
+     double x3, double y3)
+          draw a triangle on device dev
+          x1,y1,x2,y2,x3,y3: coordinates of the corners of the triangle
+
+     void g2_filled_triangle(int dev, double x1, double y1, double x2,
+     double y2, double x3, double y3)
+          draw a filled triangle on device dev
+          x1,y1,x2,y2,x3,y3: coordinates of the corners of the triangle
+     void g2_rectangle(int dev, double x1, double y1, double x2, double y2)
+             draw a rectangle on device dev
+             x1,y1,x2,y2: coordinates of the corners of the rectangle
+
+     void g2_filled_rectangle(int dev, double x1, double y1, double x2,
+     double y2)
+             draw a filled rectangle on device dev
+             x1,y1,x2,y2: coordinates of the corners of the rectangle
+
+     void g2_polygon(int dev, int N_pt, double *points)
+          Draw a polygon with N_pt corners on device dev
+          N_pt: Number of corners
+          points: Array of point coordinates (x1,y1,x2,y2,x3,y3 ....)
+     void g2_filled_polygon(int dev, int N_pt, double *points)
+          Draw a polygon with N_pt corners on device dev
+          N_pt: Number of corners
+          points: Array of point coordinates (x1,y1,x2,y2,x3,y3 ....)
+
+Circles, Ellipses, Arcs
+
+     void g2_circle(int dev, double x, double y, double r)
+             Draw a circle on device dev
+             x,y: center point
+             r: radius
+
+     void g2_filled_circle(int dev, double x, double y, double r)
+             Draw a filled circle on device dev
+             x,y: center point
+             r: radius
+
+
+     void g2_ellipse(int dev, double x, double y, double r1, double r2)
+          Draw an ellipse on device dev
+          x,y: center point
+          r1,r2: x and y radius
+     void g2_filled_ellipse(int dev, double x, double y, double r1, double
+     r2)
+          Draw a filled ellipse on device dev
+          x,y: center point
+          r1,r2: x and y radius
+     void g2_arc(int dev, double x, double y, double r1, double r2, double
+     a1, double a2)
+          Draw an arc on device dev
+          x,y: center point
+          r1,r2: x and y radius
+          a1,a2: starting and ending angle in radians
+     void g2_filled_arc(int dev, double x, double y, double r1, double r2,
+     double a1, double a2)
+          Draw a filled arc on device dev
+          x,y: center point
+          r1,r2: x and y radius
+          a1,a2: starting and ending angle in radians
+
+Text
+
+     void g2_string(int dev, double x, double y, char *text)
+          Draw a text string on device dev
+          x,y: Position of text
+          text: pointer to text string
+
+Images
+
+     void g2_image(int dev, double x, double y,  int x_size, int y_size, int
+     *pens)
+          Draw a pen image on device dev
+          x,y: Position of image (lower left corner)
+          x_size,y_size: size of image
+          pens: integer array of size x_size x y_size specifying pen colors
+
+----------------------------------------------------------------------------
+
+Style Functions
+
+Colors
+
+     int g2_ink(int dev, double red, double green, double blue)
+          create new pen color for device dev
+          red,green,blue: RGB value of new color, values can range from 0..1
+
+          returns: index of new color
+     void g2_pen(int dev, int color)
+          select new drawing color for device dev
+          color: index of new color to use.
+     void g2_reset_palette(int dev)
+          reset palette of device dev to default color palette
+     void g2_clear_palette(int dev)
+          clear palette of device dev
+
+Line Styles
+
+     void g2_set_dash(int dev, int N, double *dashes)
+             set dash style for lines for device dev
+
+     void g2_set_line_width(int dev, double w)
+          set line width for device dev
+          width: width of line in ... units
+
+Text
+
+     void g2_set_font_size(int dev, double size)
+          set font size for device dev
+          size: new font size
+
+----------------------------------------------------------------------------
+
+Device Support
+
+The following tables show which functions are supported for which device.
+Support can either be provided by native functions for the device or
+emulation by the kernel. Some functions are internal functions of the
+g2_kernel and are automatically supported by all devices.
+
+Legend:
+x ............ Native support
+E ........... Emulation of function
+K ........... Kernel internal function
+
+ Function                 PS   X11   GIF   xfig Win32
+ g2_close                  x    x     x     x     x
+ g2_output_to              K    K    K      K     K
+ g2_set_auto_flush         K    K     K     K     K
+ g2_set_coordinate_system  K    K     K     K     K
+ g2_flush                       x
+ g2_save                             x
+
+ Drawing Functions
+
+ Function            PS   X11   GIF   xfig Win32   Emulation with
+ g2_clear                   x    x           x
+ g2_set_background          x    x           x
+ g2_move              K    K     K     K     K
+ g2_move_r            K    K     K     K     K
+ g2_plot              x     x    x           x
+ g2_plot_r            K    K     K     K     K
+ g2_set_QP            K    K     K     K     K
+ g2_plot_QP           K    K     K     K     K
+ g2_line              x    x     x     x     x
+ g2_line_to           K    K     K     K     K
+ g2_line_r            K    K     K     K     K
+ g2_poly_line         x     x    x           x   g2_line
+ g2_triangle          x     x    x           x   g2_line
+ g2_filled_triangle   x     x    x           x   g2_filled_polygon
+ g2_rectangle         x     x    x           x   g2_line
+ g2_filled_rectangle  x     x    x           x   g2_filled_polygon
+ g2_polygon           x     x    x           x   g2_line
+ g2_filled_polygon    x     x    x           x
+ g2_circle            x     x    x           x   g2_ellipse
+ g2_filled_circle     x     x    x           x   g2_filled_ellipse
+ g2_ellipse           x     x    x           x   g2_arc
+ g2_filled_ellipse    x     x    x           x   g2_filled_arc
+ g2_arc               x     x    x           x
+ g2_filled_arc        x     x                x
+ g2_string            x     x                x
+
+Developing new devices
+
+A major ... during the development of g2 was to keep implementation of new
+physical devices easy and straightforward.
+
+(This section is obviously still in work)
+
+
+Known bugs and problems
+
+Win32:
+
+   * You may experience problems importing EMF to CorelDraw 8 and possibly
+     other applications (e.g. dashed lines not working). This is a problem
+     of the CorelDraw import filter and not a bug in g2 ! You can correctly
+     view enhanced metafiles with the Microsoft program ENMETA.EXE
+     (downloadable at several ftp sites) and also export placable WMF files
+     with this tool.
+   * Dashed lines should not work with Win95 according to MS-VC++
+     documentation (not tested).
+
+Perl:
+
+   * You cannot use a perl G2 device variable twice, i.e.
+
+     $d = newX11(100,100);
+     .....
+     $d->close();
+     $d = newX11(200,200);
+
+     will not work properly. This should be fixed in the next release.
+
+GIF:
+
+   * dashed lines are not yet implemented
+
+ToDo
+
+General:
+
+   * Implement additional devices: Xfig (in development), MacOS (help wanted
+     !), other Bitmap output (e.g. PNG, JPEG, BMP), ...
+
+   * Documentation for implementing new physical devices.
+
+   * Implement native image support and image import functions.
+
+Win32:
+
+   * Compile g2 as a pure DLL rather as a static library. This would allow
+     the use of g2 from applications such as Word, Excel, Access, etc.
+
+Appendix
+
+PostScript paper sizes
+
+                           Name         Size(Pt)
+ g2_A0              A0                2384 x 3370
+ g2_A1              A1                1684 x 2384
+ g2_A2              A2                1191 x 1684
+ g2_A3              A3                842 x 1191
+ g2_A4              A4                595 x 842
+ g2_A5              A5                420 x 595
+ g2_A6              A6                297 x 420
+ g2_A7              A7                210 x 297
+ g2_A8              A8                148 x 210
+ g2_A9              A9                105 x 148
+ g2_B0              B0                2920 x 4127
+ g2_B1              B1                2064 x 2920
+ g2_B2              B2                1460 x 2064
+ g2_B3              B3                1032 x 1460
+ g2_B4              B4                729 x 1032
+ g2_B5              B5                516 x 729
+ g2_B6              B6                363 x 516
+ g2_B7              B7                258 x 363
+ g2_B8              B8                181 x 258
+ g2_B9              B9                127 x 181
+ g2_B10             B10               91 x 127
+ g2_Comm_10_EnvelopeComm #10 Envelope 297 x 684
+ g2_C5_Envelope     C5 Envelope       461 x 648
+ g2_DL_Envelope     DL Envelope       312 x 624
+ g2_Folio           Folio             595 x 935
+ g2_Executive       Executive         522 x 756
+ g2_Letter          Letter            612 x 792
+ g2_Legal           Legal             612 x 1008
+ g2_Ledger          Ledger            1224 x 792
+ g2_Tabloid         Tabloid           792 x 1224

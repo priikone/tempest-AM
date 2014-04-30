@@ -1,0 +1,4 @@
+* Add frame-buffer version of the program.
+* Add Frequency Modulation (FM) support. The program uses
+  currently only Amplitude Modulation (AM).
+* Change the name to Tempest-Radio after adding FM support.

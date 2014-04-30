@@ -1,0 +1,74 @@
+0.40 ()
+=======
+- added perl support
+- g2_draw_string replaced with g2_string
+- added g2_image function
+- added g2_control_pd.* files
+- g2_device_exist moved to user space (perl)
+- added g2_set_line_width support in GIF device 
+- added prefix to Makefile.in
+- updated descrip.mms
+
+0.30 (23.10.1998)
+================
+- finished Win32 implementation
+- fixed bug in virtual device section
+- minor changes in g2_X11.c (include string.h)
+- finished VMS port (descrip.mms files)
+
+0.23 (09.07.1998)
+=================
+- finished Fortran interface (tested on Linux and DU)
+- added arc and filled_arc emulation
+- minor bug fix in g2_ui_control.c (thanks to E.M. (Mark) Palandri)
+- finished GIF interface
+- added new demo files
+- some bug fixes
+
+0.22 (03.06.1998)
+=================
+- bugfix in g2_device.c
+- minor changes
+
+0.21 (03.06.1998)
+=================
+- added g2_ld (last device) concept
+- minor changes in make procedures
+- back to the normal 'numbering' :-)
+- added (very simple) demo0.c
+
+0.20a (02.06.1998)
+==================
+- added configure script
+- changed file/make structure of g2 project
+- changed version numbering (a-alpha, b-beta etc.)
+
+0.11 (30.04.1998)
+=================
+- fixed bug in Makefile
+- fixed bug with r rescaling (circle, ellipse and arc) in g2_graphic_pd.c
+- small fix in g2_X11
+- added g2_us2pds_xxxx in g2_util.c
+- minor changes in makefile.i386 and makefile.alpha
+
+0.10 (24.04.1998)
+=================
+- major kernel rewrite
+- small fixes in X11 part
+- removed funix: g2_AllocateBasicColors
+- added Fortran interface (alpha)
+
+0.02 (31.03.1998)
+=================
+- new funix: g2_Save
+- added contrib directory
+
+
+0.01 (19.03.1998)
+=================
+- created CHANGES file :-)
+- some small fixes
+- added g2_attach_X11X and changed g2_attach_X11 to be a wrapper to
+  the new function
+- added PostScript interface
+

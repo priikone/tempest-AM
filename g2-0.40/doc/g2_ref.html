@@ -1,0 +1,1924 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.5 [en] (X11; I; OSF1 V4.0 alpha) [Netscape]">
+   <title>g2_ref</title>
+</head>
+<body>
+
+<center>
+<h1>
+g2 - graphic library</h1></center>
+
+<center>
+<h3>
+Version 0.40</h3></center>
+
+<center>
+<h3>
+(C) 1999 Lj. Milanovic, H. Wagner</h3></center>
+
+<center>To check for news and latest version see the <a href="http://www.ap.univie.ac.at/users/ljubo/g2/g2.shtml">g2-home
+page</a> (http://www.ap.univie.ac.at/users/ljubo/g2/g2.shtml)</center>
+
+<hr WIDTH="100%">
+<h1>
+Contents</h1>
+
+<h2>
+<a href="#licensenotice">License Notice</a></h2>
+
+<h2>
+<a href="#Introduction">Introduction</a></h2>
+
+<h2>
+<a href="#GettingStarted">Getting Started</a></h2>
+
+<ul>
+<li>
+<font size=+1><a href="#Installation">Installation</a></font></li>
+
+<li>
+<font size=+1><a href="#A simple example">A simple example</a></font></li>
+
+<li>
+<font size=+1><a href="#Moreexamples">More examples</a></font></li>
+
+<li>
+<font size=+1><a href="#Fortraninterface">Fortran interface</a></font></li>
+
+<li>
+<font size=+1><a href="#Perlinterface">Perl interface</a></font></li>
+</ul>
+
+<h2>
+<a href="#Function Reference">g2 Function Reference</a></h2>
+
+<ul>
+<li>
+<font size=+1><a href="#Device Functions">Device Functions</a></font></li>
+
+<li>
+<font size=+1><a href="#drawingfunctions">Drawing Functions</a></font></li>
+
+<ul>
+<li>
+<font size=+1><a href="#General">General</a></font></li>
+
+<li>
+<font size=+1><a href="#Pixels and QuasiPixels">Pixels and QuasiPixels</a></font></li>
+
+<li>
+<font size=+1><a href="#lines">Lines</a></font></li>
+
+<li>
+<font size=+1><a href="#trangles">Triangles, Rectangles, Polygons</a></font></li>
+
+<li>
+<font size=+1><a href="#circles">Circles, Ellipses, Arcs</a></font></li>
+
+<li>
+<font size=+1><a href="#text">Text</a></font></li>
+
+<li>
+<font size=+1><a href="#images">Images</a></font></li>
+</ul>
+</ul>
+
+<ul>
+<li>
+<font size=+1><a href="#stylefunctions">Style Functions</a></font></li>
+
+<ul>
+<li>
+<font size=+1><a href="#Colors">Colors</a></font></li>
+
+<li>
+<font size=+1><a href="#Line Styles">Line Styles</a></font></li>
+
+<li>
+<font size=+1><a href="#StyleText">Text</a></font></li>
+</ul>
+</ul>
+
+<h2>
+<a href="#Device Support">g2 Device Support</a></h2>
+
+<h2>
+<a href="#Developing">Developing new devices</a></h2>
+
+<h2>
+<a href="#Bugs">Known Bugs and ToDo</a></h2>
+
+<h2>
+<a href="#Appendix">Appendix</a></h2>
+
+<ul>
+<li>
+<a href="#PostScript paper">PostScript paper sizes</a></li>
+</ul>
+
+<h1>
+
+<hr SIZE=5 WIDTH="100%"><a NAME="licensenotice"></a>License Notice</h1>
+<b>This program is covered with GNU General Public License (GPL) and&nbsp;
+not with GNU Library General Public License (LGPL)! It is allowed only
+for GPL programs to use (static/dynamic linkage or any other using of code)
+the g2 library. If you want to develop a non GPL application and want to
+use g2 please contact the authors.</b>
+<p>See the&nbsp; GNU General Public License (GPL) for details.
+<h2>
+<a NAME="Introduction"></a>Introduction</h2>
+What is g2 ?
+<p>Short version (if you are in hurry):
+<ul>
+<li>
+2D graphic library</li>
+
+<li>
+Simple to use</li>
+
+<li>
+Supports several types of output devices (currently X11, GIF, PostScript
+and WinNT)</li>
+
+<li>
+Concept allows easy implementation of new device types</li>
+
+<li>
+<i>Virtual devices</i> allow to send output simultaneously to several devices</li>
+
+<li>
+User definable coordinate system</li>
+
+<li>
+Written in ANSI-C</li>
+
+<li>
+Tested under Digital Unix, AIX, Linux, VMS and Windows NT</li>
+
+<li>
+Perl support</li>
+
+<li>
+Fortran interface</li>
+</ul>
+Long version:
+<p>g2 is a simple to use graphics library for 2D graphical applications
+written in Ansi-C. This library provides a comprehensive set of functions
+for simultaneous generation of graphical output on different types of devices.
+Presently, following devices are currently supported by g2: X11, GIF, PostScript
+(xfig is in developement).
+<br>One major feature of the g2_library is the concept of virtual devices.
+An arbitrary number of physical devices (such as GIF, or X11) can be grouped
+to create a so-called virtual device. Commands sent to such a virtual devices
+will automatically issued to all attached physical devices. This allows
+for example simultaneous output to a GIF file and a Postscript file. A
+virtual device in turn can be attached to another virtual device, allowing
+to construct trees of devices.
+<br>Virtual devices can also be useful when using different user-coordinate
+systems. E.g. one X11 window showing an overview of a graphical output,
+and a second window showing&nbsp; a zoom of a more detailed area of the
+graphic. Drawing in both windows is performed by one single command to
+the virtual device.
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /-------> GIF:&nbsp;&nbsp; g2_attach(id_GIF,..
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----------------------&nbsp;
+g2_plot---> | Virtual device: id |--------> X11:&nbsp;&nbsp; g2_attach(id_X11,...
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -----------------------
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \-------> PS:&nbsp;&nbsp;&nbsp; g2_attach(id_PS,...</pre>
+If you don't need or like the concept of virtual devices, simply ignore
+it.
+<h2>
+
+<hr SIZE=5 WIDTH="100%"><a NAME="GettingStarted"></a>Getting Started</h2>
+Preinstallation tasks:
+<ul>
+<li>
+GIF support</li>
+</ul>
+
+<blockquote>g2 uses the gd library by Thomas Boutell to generate GIF files.
+This package is freeware (however not GPL) and can be downloaded at <a href="http://www.boutell.com/gd/">http://www.boutell.com/gd/</a>.
+<br>Version 1.3 uses a non-LZW-based GIF compression code to avoid the
+patent issues associated with the LZW method.
+<br>Linux users might prefer to install a pre-compiled gd rpm package which
+should be available at your local RedHat mirrorsite.
+<br>NT users should install the gd source package in a subdirectory named
+"gd" which should be located in the same directory as the g2 subdirectory
+(but not in the g2 directory itself). Otherwise file locations for gd must
+be modified in the g2 project workspace.
+<br>Unix and VMS users will have to build and install gd according to the
+instructions found in the gd distribution.</blockquote>
+
+<h3>
+<a NAME="Installation"></a>Installation</h3>
+
+<p><br>LINUX
+<ul>
+<li>
+Either install RPM packet with binaries, or compile as described in the
+UNIX section</li>
+</ul>
+UNIX
+<ul>
+<li>
+Extract package with gzip -dc g2-xxxx.tar.gz | tar xvf -</li>
+
+<li>
+Run './configure'</li>
+
+<li>
+Optionally run 'make depend'</li>
+
+<li>
+Run 'make'</li>
+
+<li>
+Run 'make install' or copy libg2.a and g2.h, g2_X11.h, g2_GIF.h, anf g2_PS.h
+to the default locations for library and include files.</li>
+
+<li>
+Optional: run 'make demo' to compile demo applications</li>
+</ul>
+WINDOWS NT
+<ul>
+<li>
+Extract package using either the .tar.gz or the .zip distribution</li>
+
+<li>
+MS Visual C++ users can build both library and demos with the supplied
+project file: g2.dsw (To obtain an icon and use menu functions you must
+also build the g2res project in g2.dsw)</li>
+
+<li>
+users of gcc or other commandline based compilers with make support continue
+as in Unix example</li>
+
+<li>
+It is also possible to compile g2 on winNT/95 using the free cygwin32 library
+and a X-windows library for windows. Theoretically it should be possible
+to support both X-windows and native NT/95 windows at the same time.</li>
+</ul>
+<font size=+0>PERL</font>
+<ul>
+<li>
+Change to directory g2_perl</li>
+
+<li>
+Perform following steps</li>
+
+<ul>
+<li>
+perl Makefile.PL</li>
+
+<li>
+make</li>
+
+<li>
+make test</li>
+
+<li>
+make install</li>
+</ul>
+
+<li>
+See the <a href="#Perlinterface">perl interface</a> section for more information</li>
+</ul>
+<font size=+0>VMS</font>
+<blockquote>
+<li>
+Try to extract either the tar.gz or the zip distribution (whatever is easier
+for you)</li>
+
+<li>
+type mms to compile library (descrip.mms file is suplied)</li>
+
+<li>
+run mms in demo directory to compile demo applications</li>
+</blockquote>
+
+<h3>
+<a NAME="A simple example"></a>A simple example</h3>
+The following example is a minimal application. It&nbsp; draws a rectangle
+in a postscript file.
+<pre>&nbsp;</pre>
+
+<blockquote>
+<pre>#include &lt;g2.h>&nbsp;
+#include &lt;g2_PS.h>&nbsp;
+
+main()&nbsp;
+{&nbsp;
+int id;&nbsp;
+id = <a href="#g2_attach_PS">g2_open_PS</a>("rect.ps", g2_A4, g2_PS_land);&nbsp;
+<a href="#g2_rectangle">g2_rectangle</a>(id,20,20,150,150);&nbsp;
+<a href="#g2_close">g2_close</a>(id);&nbsp;
+}</pre>
+</blockquote>
+1.) Always include &lt;g2.h>. Additionally include header files for all
+types of devices you want to use.
+<p>2.) Open devices using <a href="#Attach">g2_open functions</a>. The
+open function returns a device id of type int, which you need to refer
+to the device.
+<p>3.) use g2 functions for <a href="#drawingfunctions">drawing</a>, <a href="#stylefunctions">changing
+drawing styles</a>, or doing <a href="#Device Functions">other stuff</a>
+<p>4.) call <a href="#g2_close">g2_close</a> to close device
+<br>&nbsp;
+<p><b>You want to draw a GIF file instead of a PostScript file ?</b>
+<p>replace the PS header file with
+<pre>#include &lt;g2_GIF.h></pre>
+and replace the g2_open_PS function call with
+<pre>id = <a href="#g2_attach_GIF">g2_open_GIF</a>("rect.gif",300,200);</pre>
+<b>You want to draw to a GIF file and a PostScript file with one plot command
+?</b>
+<p>Here we use the concept of virtual devices. Open a GIF and PostScript
+device, then open a virtual device and attach both the GIF and PostScript
+device to the virtual device. Plot commands to the virtual device will
+be issued to both GIF and PostScript device. You can attach and detatch
+further devices at any time.
+<pre>#include &lt;g2.h>&nbsp;
+#include &lt;g2_PS.h>&nbsp;
+#include &lt;g2_GIF.h>
+
+main()&nbsp;
+{&nbsp;
+int id_PS,id_GIF,id;&nbsp;
+
+id_PS&nbsp; = <a href="#g2_attach_PS">g2_open_PS</a>("rect.ps", g2_A4, g2_PS_land);&nbsp;
+id_GIF = <a href="#g2_attach_GIF">g2_open_GIF</a>("rect.gif",300,200);
+id&nbsp;&nbsp;&nbsp;&nbsp; = <a href="#g2_open_vd">g2_open_vd</a>();</pre>
+
+<pre><a href="#g2_attach">g2_attach</a>(id,id_PS);
+<a href="#g2_attach">g2_attach</a>(id,id_GIF);</pre>
+
+<pre><a href="#g2_rectangle">g2_rectangle</a>(id,20,20,150,150);&nbsp;
+<a href="#g2_circle">g2_circle</a>(id,50,60,100);&nbsp;
+
+<a href="#g2_close">g2_close</a>(id);
+}</pre>
+Note: closing a virtual device automatically closes all attached devices.
+<h3>
+<a NAME="Moreexamples"></a>More examples</h3>
+More examples showing the usage of different user coordinate systems, multiple
+virtual devices, etc. can be found in the distribution (demo directory).
+<br>&nbsp;
+<p><a NAME="Fortraninterface"></a><b><font size=+1>Fortran interface</font></b>
+<p>The Fortran interface for g2 is currently tested for Linux and Digital
+Unix/OSF.&nbsp; Function names for Fortran are the same as in C, however
+following differences exist:
+<ul>
+<li>
+all variables including device IDs are of type REAL</li>
+
+<li>
+void functions are implemented as subroutines and must be called with CALL</li>
+
+<li>
+constants defined by #define in C (e.g.&nbsp; g2_A4) do not work. Get corresponding
+values from the apropriate header files.</li>
+</ul>
+A short Fortran example:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; program demo
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; real d,color
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; d=g2_open_PS('demo_f.ps', 4.0, 1.0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call g2_plot(d, 50.0, 50.0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call g2_string(d, 25.0, 75.0, 'TEST ')
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; color=g2_ink(d, 1.0, 0.0, 0.0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; write (6,*) color
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call g2_pen(d, color)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call g2_circle(d, 20.0, 20.0, 10.0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call g2_flush(d)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call g2_close(d)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stop
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; end</pre>
+
+<p><br><a NAME="Perlinterface"></a><b><font size=+1>Perl interface</font></b>
+<p>The perl interface for g2 is currently tested for Linux and Digital
+Unix/OSF.&nbsp; Function names in perl are the same as in C, however the
+device itself is implemented object orientated, i.e. the device argument
+is ommited in all functions.
+<br>E.g., following simple perl script:
+<br>&nbsp;
+<blockquote>
+<blockquote>
+<pre>use G2;</pre>
+
+<pre>$d = newX11 G2::Device(100,100);
+$d->circle(10, 10, 20);
+$d->string(20, 40, "Hello World");</pre>
+
+<pre>print "\nDone.\n[Enter]\n";
+getc(STDIN);</pre>
+
+<pre>$d->close()</pre>
+</blockquote>
+</blockquote>
+
+<p><br>The creator functions are newX11, newGIF, newPS, etc. and accept
+the same arguments as the open functions in the C version.
+<br>See the perl documentation (perldoc G2) for more details and the test.pl
+script for a more extensive example.
+<p>
+<hr SIZE=5 WIDTH="100%">
+<h2>
+<a NAME="Function Reference"></a>g2 Function Reference</h2>
+
+<h3>
+<a NAME="Attach"></a>Device Functions</h3>
+
+<blockquote><b>int&nbsp;<a NAME="g2_attach_X11"></a>g2_open_X11(int width,
+int height)</b>
+<blockquote>open an X11 window
+<br><b>width,height:</b> width and height of X11 window in pixels
+<br><b>returns :</b> device id of new X11 device.</blockquote>
+</blockquote>
+
+<blockquote><b>int&nbsp;<a NAME="g2_attach_X11X"></a>g2_open_X11X(int width,
+int height, int x, int y, char *window_name, char *icon_name, char *icon_data,
+int icon_width, int icon_height);</b></blockquote>
+
+<blockquote>
+<blockquote>open an X11 window supporting additional features as icons
+and window title.
+<br><b>width,height:</b> width and height of X11 window in pixels
+<br><b>x,y:</b> position of window on screen
+<br><b>window_name:</b> \0 terminated string of name of window
+<br><b>icon_name:</b>
+<br><b>icon_data:</b>
+<br><b>icon_width,icon_height:</b>
+<br><b>returns : </b>device id of new X11 device.</blockquote>
+</blockquote>
+
+<blockquote><b>int&nbsp;<a NAME="g2_attach_PS"></a>g2_open_PS(const char
+*file_name,&nbsp;&nbsp; enum g2_PS_paper paper,&nbsp;&nbsp; enum g2_PS_orientation
+orientation)</b></blockquote>
+
+<blockquote>
+<blockquote>open a new PostScript device
+<br><b>file_name: </b>name of PostScript file
+<br><b>paper: </b>Paper size (e.g. g2_A4, g2_Letter). See <a href="#PostScript paper">PostScript
+paper sizes</a> for a full list of supported sizes.
+<br><b>orientation: </b>paper orientation. Either g2_PS_land for landscape
+or g2_PS_port&nbsp; for&nbsp; portrait
+<br><b>returns :</b> device id of new PostScript device.</blockquote>
+<b>int&nbsp;<a NAME="g2_attach_win32"></a>g2_open_win32(int width, int
+height, const char *name, int type)</b>
+<blockquote>open a new Win32 device
+<br><b>width,height:</b> width and height of GIF image in pixels
+<br><b>name: </b>depending on the value of "type" (see below) either window
+title or name of the metafile.
+<br><b>type: </b>Defines the output type of win32 device:
+<br>&nbsp;&nbsp;&nbsp; 0:&nbsp;&nbsp;&nbsp; output to a window
+<br>&nbsp;&nbsp;&nbsp; 1:&nbsp;&nbsp;&nbsp; output to an enhanced metafile
+(EMF)
+<br><b>returns :</b> device id of new win32 device</blockquote>
+</blockquote>
+
+<blockquote><b>int&nbsp;<a NAME="g2_attach_GIF"></a>g2_open_GIF(int width,
+int height, const char *filename)</b></blockquote>
+
+<blockquote>
+<blockquote>open a new GIF device
+<br><b>width,height:</b> width and height of GIF image in pixels
+<br><b>filename: </b>name of GIF file.
+<br><b>returns :</b> device id of new GIF device</blockquote>
+</blockquote>
+
+<blockquote><b>int&nbsp;<a NAME="g2_open_vd"></a>g2_open_vd(void)</b></blockquote>
+
+<blockquote>
+<blockquote>open a new virtual device
+<br><b>returns : </b>device id of new virtual device.</blockquote>
+</blockquote>
+<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; void&nbsp;<a NAME="g2_attach"></a>g2_attach(int
+vd_dev, int dev)</b>
+<br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>attach
+a device to an existing virtual device
+<br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+vd_dev : </b>device id of virtual device to attach to.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>dev
+: </b>device id of device to attach, this can be either a physical or a
+virtual device.
+<p><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; void&nbsp;<a NAME="g2_detach"></a>g2_detach(int
+vd_dev, int dev)</b>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+detach a device attached to a virtual device
+<br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+vd_dev : </b>device id of virtual device to detach from.
+<br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+dev : </b>device id of device to detach.
+<h3>
+<a NAME="Device Functions"></a>Device Functions</h3>
+
+<ul><b>void&nbsp;<a NAME="g2_close"></a>g2_close(int dev)</b>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; close device
+<br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; dev: </b>device ID of
+device to close</ul>
+
+<ul>
+<ul TYPE=DISC>&nbsp;</ul>
+<b>void&nbsp;<a NAME="g2_set_auto_flush"></a>g2_set_auto_flush(int dev,
+int on_off);</b>
+<ul>switch on/off autoflush for specified device <b>dev</b>
+<br><b>on/off:</b> 0 = off, 1 = on</ul>
+<b>void&nbsp;<a NAME="g2_set_coordinate_system"></a>g2_set_coordinate_system(int
+dev, double x_origin, double y_origin, double x_mul, double y_mul)</b>
+<ul>set origin and scaling for the device <b>dev</b>
+<br><b>x,y: </b>coordinates of origin
+<br><b>x_mul,y_mul: </b>scaling factor for x- and y axis</ul>
+<b>void&nbsp;<a NAME="g2_flush"></a>g2_flush(int dev)</b>
+<ul>flush device <b>dev</b></ul>
+<b>void&nbsp;<a NAME="g2_save"></a>g2_save(int dev)</b>
+<ul>Applies to file devices only. Flush, save and close files of device
+<b>dev</b>.
+The device remains open. Use to generate valid intermediate output files.</ul>
+<b>void<a NAME="g2_ld"></a> g2_ld()</b>
+<ul>Returns id of last accessed device (macro <b>G2LD </b>is defined as
+g2_ld() )</ul>
+</ul>
+
+<hr SIZE=4 WIDTH="100%">
+<h2>
+<a NAME="drawingfunctions"></a>Drawing Functions</h2>
+
+<h3>
+<a NAME="General"></a>General</h3>
+
+<ul><b>void&nbsp;<a NAME="g2_clear"></a>g2_clear(int dev)</b>
+<ul>Clear device <b>dev</b></ul>
+<b>void&nbsp;<a NAME="g2_set_background"></a>g2_set_background(int dev,
+int color)</b>
+<ul>Set background color for device <b>dev</b>
+<br><b>color:</b> index of colorpalette for new background color</ul>
+<b>void&nbsp;<a NAME="g2_move"></a>g2_move(int dev, double x, double y)</b>
+<ul>set new current point for device <b>dev</b>
+<br><b>x,y: </b>coordinates of new current point</ul>
+<b>void&nbsp;<a NAME="g2_move_r"></a>g2_move_r(int dev, double dx, double
+dy)</b>
+<ul>set new current point relative to current point for device <b>dev</b>
+<br><b>x,y: </b>relative coordinates of new current point</ul>
+</ul>
+
+<h3>
+<a NAME="Pixels and QuasiPixels"></a>Pixels and QuasiPixels</h3>
+
+<ul><b>void&nbsp;<a NAME="g2_plot"></a>g2_plot(int dev, double x, double
+y)</b>
+<p><b>void&nbsp;<a NAME="g2_plot_r"></a>g2_plot_r(int dev, double dx, double
+dy)</b>
+<p><b>void&nbsp;<a NAME="g2_set_QP"></a>g2_set_QP(int dev, double d, enum
+QPshape shape);</b>
+<p><b>void&nbsp;<a NAME="g2_plot_QP"></a>g2_plot_QP(int dev, double x,
+double y);</b></ul>
+
+<h3>
+<a NAME="lines"></a>Lines</h3>
+
+<ul><b>void&nbsp;<a NAME="g2_line"></a>g2_line(int dev, double x1, double
+y1, double x2, double y2)</b>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Draw a line on device <b>dev</b>
+<br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x1,y1:</b> starting point
+<br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x2,y2:</b> ending point
+<p><b>void&nbsp;<a NAME="g2_line_to"></a>g2_line_to(int dev, double x,
+double y)</b>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Draw a line from current
+position on device <b>dev</b>
+<br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x,y:</b> ending point</ul>
+
+<ul>
+<ul>&nbsp;</ul>
+<b>void&nbsp;<a NAME="g2_line_r"></a>g2_line_r(int dev, double dx, double
+dy)</b>
+<ul>Draw a line relative to the current position on device <b>dev</b>
+<br><b>dx,dy:</b> relative coordinates of the ending point</ul>
+<b>void&nbsp;<a NAME="g2_poly_line"></a>g2_poly_line(int dev, int N_pt,
+double *points)</b>
+<ul>Draw a polyline with N_pt corners on device <b>dev</b>
+<br><b>N_pt:</b> Number of corners
+<br><b>points:</b> Array of point coordinates (x1,y1,x2,y2,x3,y3 ....)</ul>
+</ul>
+
+<h3>
+<a NAME="trangles"></a>Triangles, Rectangles, Polygons</h3>
+
+<ul><b>void&nbsp;<a NAME="g2_triangle"></a>g2_triangle(int dev, double
+x1, double y1, double x2, double y2, double x3, double y3)</b>
+<ul>draw a triangle on device <b>dev</b>
+<br><b>x1,y1,x2,y2,x3,y3:</b> coordinates of the corners of the triangle</ul>
+</ul>
+
+<ul><b>void&nbsp;<a NAME="g2_filled_triangle"></a>g2_filled_triangle(int
+dev, double x1, double y1, double x2, double y2, double x3, double y3)</b>
+<ul>draw a filled triangle on device <b>dev</b>
+<br><b>x1,y1,x2,y2,x3,y3:</b> coordinates of the corners of the triangle</ul>
+<b>void&nbsp;<a NAME="g2_rectangle"></a>g2_rectangle(int dev, double x1,
+double y1, double x2, double y2)</b>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; draw a rectangle on device
+<b>dev</b>
+<br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x1,y1,x2,y2:</b> coordinates
+of the corners of the rectangle
+<p><b>void&nbsp;<a NAME="g2_filled_rectangle"></a>g2_filled_rectangle(int
+dev, double x1, double y1, double x2, double y2)</b>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; draw a filled rectangle
+on device <b>dev</b>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>x1,y1,x2,y2:</b> coordinates
+of the corners of the rectangle</ul>
+
+<ul><b>void&nbsp;<a NAME="g2_polygon"></a>g2_polygon(int dev, int N_pt,
+double *points)</b>
+<ul>Draw a polygon with N_pt corners on device <b>dev</b>
+<br><b>N_pt:</b> Number of corners
+<br><b>points:</b> Array of point coordinates (x1,y1,x2,y2,x3,y3 ....)</ul>
+<b>void&nbsp;<a NAME="g2_filled_polygon"></a>g2_filled_polygon(int dev,
+int N_pt, double *points)</b>
+<ul>Draw a polygon with N_pt corners on device <b>dev</b>
+<br><b>N_pt:</b> Number of corners
+<br><b>points:</b> Array of point coordinates (x1,y1,x2,y2,x3,y3 ....)</ul>
+</ul>
+
+<h3>
+<a NAME="circles"></a>Circles, Ellipses, Arcs</h3>
+
+<ul><b>void&nbsp;<a NAME="g2_circle"></a>g2_circle(int dev, double x, double
+y, double r)</b>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Draw a circle on device
+<b>dev</b>
+<br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x,y:</b> center point
+<br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; r:</b> radius</ul>
+
+<ul><b>void&nbsp;<a NAME="g2_filled_circle"></a>g2_filled_circle(int dev,
+double x, double y, double r)</b>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Draw a filled circle on
+device <b>dev</b>
+<br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x,y:</b> center point
+<br><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; r:</b> radius</ul>
+
+<ul>
+<ul>&nbsp;</ul>
+<b>void&nbsp;<a NAME="g2_ellipse"></a>g2_ellipse(int dev, double x, double
+y, double r1, double r2)</b>
+<ul>Draw an ellipse on device <b>dev</b>
+<br><b>x,y:</b> center point
+<br><b>r1,r2:</b> x and y radius</ul>
+<b>void&nbsp;<a NAME="g2_filled_ellipse"></a>g2_filled_ellipse(int dev,
+double x, double y, double r1, double r2)</b>
+<ul>Draw a filled ellipse on device <b>dev</b>
+<br><b>x,y:</b> center point
+<br><b>r1,r2:</b> x and y radius</ul>
+<b>void&nbsp;<a NAME="g2_arc"></a>g2_arc(int dev, double x, double y, double
+r1, double r2, double a1, double a2)</b>
+<ul>Draw an arc on device <b>dev</b>
+<br><b>x,y:</b> center point
+<br><b>r1,r2:</b> x and y radius
+<br><b>a1,a2: </b>starting and ending angle in radians</ul>
+<b>void&nbsp;<a NAME="g2_filled_arc"></a>g2_filled_arc(int dev, double
+x, double y, double r1, double r2, double a1, double a2)</b>
+<ul>Draw a filled arc on device <b>dev</b>
+<br><b>x,y:</b> center point
+<br><b>r1,r2:</b> x and y radius
+<br><b>a1,a2: </b>starting and ending angle in radians</ul>
+</ul>
+
+<h3>
+<a NAME="text"></a>Text</h3>
+
+<ul><b>void&nbsp;<a NAME="g2_string"></a>g2_string(int dev, double x, double
+y, char *text)</b>
+<ul>Draw a text string on device <b>dev</b>
+<br><b>x,y: </b>Position of text
+<br><b>text:</b> pointer to text string</ul>
+</ul>
+
+<h3>
+<a NAME="images"></a>Images</h3>
+
+<ul><b>void&nbsp;<a NAME="g2_image"></a>g2_image(int dev, double x, double
+y,&nbsp; int x_size, int y_size, int *pens)</b>
+<ul>Draw a pen image on device <b>dev</b>
+<br><b>x,y: </b>Position of image (lower left corner)
+<br><b>x_size,y_size:</b> size of image
+<br><b>pens:</b> integer array of size x_size <i>x</i> y_size specifying
+pen colors</ul>
+</ul>
+
+<p><br>
+<hr WIDTH="100%">
+<h2>
+<a NAME="stylefunctions"></a>Style Functions</h2>
+
+<h3>
+<a NAME="Colors"></a>Colors</h3>
+
+<ul><b>int g2_ink(int dev, double red, double green, double blue)</b>
+<ul>create new pen color for device <b>dev</b>
+<br><b>red,green,blue:</b> RGB value of new color, values can range from
+0..1
+<br><b>returns: </b>index of new color</ul>
+<b>void g2_pen(int dev, int color)</b>
+<ul>select new drawing color for device <b>dev</b>
+<br><b>color: </b>index of new color to use.</ul>
+<b>void g2_reset_palette(int dev)</b>
+<ul>reset palette of device <b>dev </b>to default color palette</ul>
+<b>void g2_clear_palette(int dev)</b>
+<ul>clear palette of device <b>dev</b></ul>
+</ul>
+
+<h3>
+<a NAME="Line Styles"></a>Line Styles</h3>
+
+<ul><b>void g2_set_dash(int dev, int N, double *dashes)</b>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; set dash style for lines
+for device <b>dev</b></ul>
+
+<ul><b>void g2_set_line_width(int dev, double w)</b>
+<ul>set line width for device <b>dev</b>
+<br><b>width: </b>width of line in ... units</ul>
+</ul>
+
+<h3>
+<a NAME="StyleText"></a>Text</h3>
+
+<ul><b>void g2_set_font_size(int dev, double size)</b>
+<ul>set font size for device <b>dev</b>
+<br><b>size: </b>new font size</ul>
+</ul>
+
+<hr WIDTH="100%">
+<h2>
+<a NAME="Device Support"></a>Device Support</h2>
+The following tables show which functions are supported for which device.
+Support can either be provided by native functions for the device or emulation
+by the kernel. Some functions are internal functions of the g2_kernel and
+are automatically supported by all devices.
+<p>Legend:
+<br>x ............ Native support
+<br>E ........... Emulation of function
+<br>K ........... Kernel internal function
+<br>&nbsp;
+<table BORDER WIDTH="48%" >
+<tr>
+<td>Function</td>
+
+<th>
+<center>&nbsp;PS&nbsp;</center>
+</th>
+
+<th>
+<center>&nbsp;X11&nbsp;</center>
+</th>
+
+<th>
+<center>&nbsp;GIF&nbsp;</center>
+</th>
+
+<th>
+<center>&nbsp;xfig&nbsp;</center>
+</th>
+
+<td><b>Win32</b></td>
+</tr>
+
+<tr>
+<td><a href="#g2_close">g2_close</a></td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+</tr>
+
+<tr>
+<td><a href="#g2_output_to">g2_output_to</a></td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K&nbsp;</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+</tr>
+
+<tr>
+<td><a href="#g2_set_auto_flush">g2_set_auto_flush</a></td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+</tr>
+
+<tr>
+<td><a href="#g2_set_coordinate_system">g2_set_coordinate_system</a></td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+</tr>
+
+<tr>
+<td><a href="#g2_flush">g2_flush</a></td>
+
+<td>&nbsp;</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>&nbsp;</td>
+
+<td>&nbsp;</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><a href="#g2_save">g2_save</a></td>
+
+<td>&nbsp;</td>
+
+<td>&nbsp;</td>
+
+<td>
+<center>x&nbsp;</center>
+</td>
+
+<td>&nbsp;</td>
+
+<td></td>
+</tr>
+</table>
+
+<h3>
+&nbsp;<a href="#drawingfunctions">Drawing Functions</a></h3>
+
+<table BORDER WIDTH="62%" >
+<tr>
+<td>Function&nbsp;</td>
+
+<td>
+<center><b>&nbsp;PS&nbsp;</b></center>
+</td>
+
+<td>
+<center><b>&nbsp;X11&nbsp;</b></center>
+</td>
+
+<td>
+<center><b>&nbsp;GIF&nbsp;</b></center>
+</td>
+
+<td>
+<center><b>&nbsp;xfig&nbsp;</b></center>
+</td>
+
+<td><b>Win32</b></td>
+
+<td>
+<center>Emulation with</center>
+</td>
+</tr>
+
+<tr>
+<td><a href="#g2_clear">g2_clear</a></td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><a href="#g2_set_background">g2_set_background</a></td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><a href="#g2_move">g2_move</a></td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><a href="#g2_move_r">g2_move_r</a></td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><a href="#g2_plot">g2_plot</a></td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><a href="#g2_plot_r">g2_plot_r</a></td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><a href="#g2_set_QP">g2_set_QP</a></td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><a href="#g2_plot_QP">g2_plot_QP</a></td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><a href="#g2_line">g2_line</a></td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><a href="#g2_line_to">g2_line_to</a></td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><a href="#g2_line_r">g2_line_r</a></td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td>
+<center>K</center>
+</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><a href="#g2_poly_line">g2_poly_line</a></td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td><a href="#g2_line">g2_line</a></td>
+</tr>
+
+<tr>
+<td><a href="#g2_triangle">g2_triangle</a></td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td><a href="#g2_line">g2_line</a></td>
+</tr>
+
+<tr>
+<td><a href="#g2_filled_triangle">g2_filled_triangle</a></td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x&nbsp;</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td><a href="#g2_filled_polygon">g2_filled_polygon</a></td>
+</tr>
+
+<tr>
+<td><a href="#g2_rectangle">g2_rectangle</a></td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td><a href="#g2_line">g2_line</a></td>
+</tr>
+
+<tr>
+<td><a href="#g2_filled_rectangle">g2_filled_rectangle</a></td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td><a href="#g2_filled_polygon">g2_filled_polygon</a></td>
+</tr>
+
+<tr>
+<td><a href="#g2_polygon">g2_polygon</a></td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td><a href="#g2_line">g2_line</a></td>
+</tr>
+
+<tr>
+<td><a href="#g2_filled_polygon">g2_filled_polygon</a></td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><a href="#g2_circle">g2_circle</a></td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td><a href="#g2_ellipse">g2_ellipse</a></td>
+</tr>
+
+<tr>
+<td><a href="#g2_filled_circle">g2_filled_circle</a></td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x&nbsp;</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td><a href="#g2_filled_ellipse">g2_filled_ellipse</a></td>
+</tr>
+
+<tr>
+<td><a href="#g2_ellipse">g2_ellipse</a></td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td><a href="#g2_arc">g2_arc</a></td>
+</tr>
+
+<tr>
+<td><a href="#g2_filled_ellipse">g2_filled_ellipse</a></td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x&nbsp;</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td><a href="#g2_filled_arc">g2_filled_arc</a></td>
+</tr>
+
+<tr>
+<td><a href="#g2_arc">g2_arc</a></td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><a href="#g2_filled_arc">g2_filled_arc</a></td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><a href="#g2_string">g2_string</a></td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;x</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>&nbsp;</center>
+</td>
+
+<td>
+<center>x</center>
+</td>
+
+<td></td>
+</tr>
+</table>
+
+<h2>
+<a NAME="Developing"></a>Developing new devices</h2>
+A major ... during the development of g2 was to keep implementation of
+new physical devices easy and straightforward.
+<p>(This section is obviously still in work)
+<br>&nbsp;
+<h2>
+<a NAME="Bugs"></a>Known bugs and problems</h2>
+
+<h3>
+Win32:</h3>
+
+<ul>
+<li>
+You may experience problems importing EMF to CorelDraw 8 and possibly other
+applications (e.g. dashed lines not working). This is a problem of the
+CorelDraw import filter and not a bug in g2 ! You can correctly view enhanced
+metafiles with the Microsoft program ENMETA.EXE (downloadable at several
+ftp sites) and also export placable WMF files with this tool.</li>
+
+<li>
+Dashed lines should not work with Win95 according to MS-VC++ documentation
+(not tested).</li>
+</ul>
+
+<h3>
+Perl:</h3>
+
+<ul>
+<li>
+You cannot use a perl G2 device variable twice, i.e.</li>
+
+<p><br>$d = newX11(100,100);
+<br>.....
+<br>$d->close();
+<br>$d = newX11(200,200);
+<p>will not work properly. This should be fixed in the next release.</ul>
+
+<h3>
+GIF:</h3>
+
+<ul>
+<li>
+dashed lines are not yet implemented</li>
+</ul>
+
+<h2>
+ToDo</h2>
+
+<h3>
+General:</h3>
+
+<ul>
+<li>
+Implement additional devices: Xfig (in development), MacOS (help wanted
+!), other Bitmap output (e.g. PNG, JPEG, BMP), ...</li>
+
+<br>&nbsp;
+<li>
+Documentation for implementing new physical devices.</li>
+
+<br>&nbsp;
+<li>
+Implement native image support and image import functions.</li>
+</ul>
+
+<h3>
+Win32:</h3>
+
+<ul>
+<li>
+Compile g2 as a pure DLL rather as a static library. This would allow the
+use of g2 from applications such as Word, Excel, Access, etc.</li>
+</ul>
+
+<h2>
+<a NAME="Appendix"></a>Appendix</h2>
+
+<h3>
+<a NAME="PostScript paper"></a>PostScript paper sizes</h3>
+
+<table BORDER >
+<tr>
+<th></th>
+
+<th>Name</th>
+
+<th>Size(Pt)</th>
+</tr>
+
+<tr>
+<td>g2_A0</td>
+
+<td>A0</td>
+
+<td>2384 x 3370</td>
+</tr>
+
+<tr>
+<td>g2_A1</td>
+
+<td>A1</td>
+
+<td>1684 x 2384</td>
+</tr>
+
+<tr>
+<td>g2_A2</td>
+
+<td>A2</td>
+
+<td>1191 x 1684</td>
+</tr>
+
+<tr>
+<td>g2_A3</td>
+
+<td>A3</td>
+
+<td>842 x 1191</td>
+</tr>
+
+<tr>
+<td>g2_A4</td>
+
+<td>A4</td>
+
+<td>595 x 842</td>
+</tr>
+
+<tr>
+<td>g2_A5</td>
+
+<td>A5</td>
+
+<td>420 x 595</td>
+</tr>
+
+<tr>
+<td>g2_A6</td>
+
+<td>A6</td>
+
+<td>297 x 420</td>
+</tr>
+
+<tr>
+<td>g2_A7</td>
+
+<td>A7</td>
+
+<td>210 x 297</td>
+</tr>
+
+<tr>
+<td>g2_A8</td>
+
+<td>A8</td>
+
+<td>148 x 210</td>
+</tr>
+
+<tr>
+<td>g2_A9</td>
+
+<td>A9</td>
+
+<td>105 x 148</td>
+</tr>
+
+<tr>
+<td>g2_B0</td>
+
+<td>B0</td>
+
+<td>2920 x 4127</td>
+</tr>
+
+<tr>
+<td>g2_B1</td>
+
+<td>B1</td>
+
+<td>2064 x 2920</td>
+</tr>
+
+<tr>
+<td>g2_B2</td>
+
+<td>B2</td>
+
+<td>1460 x 2064</td>
+</tr>
+
+<tr>
+<td>g2_B3</td>
+
+<td>B3</td>
+
+<td>1032 x 1460</td>
+</tr>
+
+<tr>
+<td>g2_B4</td>
+
+<td>B4</td>
+
+<td>729 x 1032</td>
+</tr>
+
+<tr>
+<td>g2_B5</td>
+
+<td>B5</td>
+
+<td>516 x 729</td>
+</tr>
+
+<tr>
+<td>g2_B6</td>
+
+<td>B6</td>
+
+<td>363 x 516</td>
+</tr>
+
+<tr>
+<td>g2_B7</td>
+
+<td>B7</td>
+
+<td>258 x 363</td>
+</tr>
+
+<tr>
+<td>g2_B8</td>
+
+<td>B8</td>
+
+<td>181 x 258</td>
+</tr>
+
+<tr>
+<td>g2_B9</td>
+
+<td>B9</td>
+
+<td>127 x 181</td>
+</tr>
+
+<tr>
+<td>g2_B10</td>
+
+<td>B10</td>
+
+<td>91 x 127</td>
+</tr>
+
+<tr>
+<td>g2_Comm_10_Envelope</td>
+
+<td>Comm #10 Envelope</td>
+
+<td>297 x 684</td>
+</tr>
+
+<tr>
+<td>g2_C5_Envelope</td>
+
+<td>C5 Envelope</td>
+
+<td>461 x 648</td>
+</tr>
+
+<tr>
+<td>g2_DL_Envelope</td>
+
+<td>DL Envelope</td>
+
+<td>312 x 624</td>
+</tr>
+
+<tr>
+<td>g2_Folio</td>
+
+<td>Folio</td>
+
+<td>595 x 935</td>
+</tr>
+
+<tr>
+<td>g2_Executive</td>
+
+<td>Executive</td>
+
+<td>522 x 756</td>
+</tr>
+
+<tr>
+<td>g2_Letter</td>
+
+<td>Letter</td>
+
+<td>612 x 792</td>
+</tr>
+
+<tr>
+<td>g2_Legal</td>
+
+<td>Legal</td>
+
+<td>612 x 1008</td>
+</tr>
+
+<tr>
+<td>g2_Ledger</td>
+
+<td>Ledger</td>
+
+<td>1224 x 792</td>
+</tr>
+
+<tr>
+<td>g2_Tabloid</td>
+
+<td>Tabloid</td>
+
+<td>792 x 1224</td>
+</tr>
+</table>
+
+</body>
+</html>

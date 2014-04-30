@@ -1,0 +1,65 @@
+
+#
+# Check for one project file
+#
+AC_INIT(src/g2_device.c)
+
+PRODUCT=g2
+
+#
+# check cannonical system name
+#
+AC_CANONICAL_HOST
+case "$host" in
+*-linux-gnu )  AC_DEFINE(LINUX) ;;
+     *-aix* )  AC_DEFINE(AIX) ;;
+          * )  AC_DEFINE(UNIX) ;;
+esac
+
+#
+# check C compiler, preprocesor, etc.
+#
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_CHECK_PROG(FIND, find, find, :)
+AC_CHECK_PROG(MAKEDEPEND, makedepend, makedepend, :)
+
+#
+# Try to locate the X Window System include files and libraries
+# and add /usr/local to include and lib path and add -lm (for testing)
+#
+AC_PATH_XTRA
+CFLAGS="$CFLAGS $X_CFLAGS -I/usr/local/include"
+LDFLAGS="$LDFLAGS $X_LIBS -L/usr/local/lib"
+
+
+DO_PS="#"
+DO_X11="#"
+DO_GIF="#"
+
+AC_CHECK_LIB(m, main, DO_PS=""; LDFLAGS="$LDFLAGS -lm";AC_DEFINE(DO_PS), break)
+AC_CHECK_LIB(X11, main, DO_X11="";LDFLAGS="$LDFLAGS -lX11";AC_DEFINE(DO_X11))
+AC_CHECK_LIB(gd, main, DO_GIF="";LDFLAGS="$LDFLAGS -lgd";AC_DEFINE(DO_GIF))
+
+#
+# Declare variables which we want substituted in the Makefile.in's
+#
+AC_SUBST(DO_PS)
+AC_SUBST(DO_X11)
+AC_SUBST(DO_GIF)
+
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS(limits.h)
+
+
+#
+# finally create makefiles using Makefile.in
+#
+echo
+AC_OUTPUT(Makefile demo/Makefile g2_perl/Makefile.PL)
+
+#echo
+#echo "Run 'make depend' to create dependencies."
+#echo

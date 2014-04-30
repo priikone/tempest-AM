@@ -1,0 +1,283 @@
+========================================================================
+                 Tempest AM Radio Signal Transmitter
+
+           Copyright (c) 1999 - 2001 GNU GPL, Pekka Riikonen,
+                      priikone@poseidon.pspt.fi
+========================================================================
+
+[Note: This package includes G2 X11 graphics library which is GNU GPL
+copyrighted by Lj. Milanovic and H. Wagner. See COPYING file in g2-0.40
+directory for detailed license information.]
+
+[Note: Markus G. Kuhn's and Ross J. Anderson's paper; "Soft Tempest:
+Hidden Data Transmission Using Electromagnetic Emanations" was used as a
+reference when programming Tempest-AM. This paper is a must read before
+going further testing Tempest-AM. The paper is availabe from
+
+	http://www.cl.cam.ac.uk/~mgk25/ih98-tempest.pdf
+
+I strongly recommend to read the paper thoroughly.]
+
+
+Description
+===========
+
+It is a well known fact that electrical devices and, in this case, 
+specifically computers generate electromagnetic radiation which causes 
+the device to interfere with radio reception, but also leak possibly 
+sensitive information being processed. Tempest is a code word for US 
+government programme aimed at attacking the radiation problem. However,
+nowadays Tempest word is casually replaced with word EMSEC which stands
+for Emission Security.
+
+The electromagnetic radiation can be picked up from a distance with
+special equipment. However, it has been showed that you don't need to have
+expensive equipment to pick up the signal. Simple handheld radio with
+some-what good antenna can do the job for you. It is also shown that with
+modified black-and-white TV-set you can receive the image on your monitor
+from a distance. This sort of equipment is not expensive and thus can be
+easily used by eavesdropper.
+
+Tempest-AM generates AM radio signal on your monitor in the form of
+patterns. This pattern causes high resolution monitors to transmit the AM
+signal. This signal can be picked up by simple handheld radio. Resolutions
+above 1024x768 are high enough to do the job. Tempest-AM was tested on
+resolution of 1152x864 and it worked fine. Tempest-AM can be set to
+transmit any tone (any tone that human ear can hear) on any carrier.
+However, there are some limits, currently it cannot transmit on FM but
+that might change in the future (read TODO -file). Tempest-AM was tested 
+on 7 Mhz to 22 Mhz. The real range is from 3 - 30 Mhz and it may be
+possible to go even further. 
+
+Tempest-AM is not a useful utility but merely an example for anyone who is
+interested in Tempest and is able to test the program. However, there are
+possible applications that someone could create. The paper by Kuhn and
+Anderson describe a few applications but I only mention that modified
+Tempest-AM program could be used to transmit data. Two distinct tones on
+same carrier could be seen as bits 0 and 1. One could transmit data showing
+these distinct patterns on high resolution monitor. The signal could then
+be picked up by, say, simple handheld radio recorder and processed
+properly to retrieve the original sent data. How the recieved signal can
+be processed to get the original data is not very hard to do. However,
+I'll leave this as an exercise for the people interested to test it.
+
+I also must note that transmitting radio signal and possibly interfering
+reception of public radio channels, may be and most certainly is illegal.
+However, testing this program will not interfere any radio channels since
+the signal cannot travel very far, or it can, but at least it cannot be 
+picked up from great distance without special equipment. And, you cannot 
+transmit on FM anyway, so this should not be a problem. But still, select 
+a frequency that is not used if you'll test the program. And don't go to
+the frequencies that are used by, say, police, fireworkers etc.
+
+This package includes SVGA lib and X11 versions of the Tempest-AM. I've
+tested both programs succesfully on high resolutions. I may add a frame
+buffer version of the program later, it should be relatively fast and
+have high resolutions and thus be a good choice to test the program.
+
+
+Compiling and installing
+========================
+
+To compile the both SVGA library version and X11 version give commands,
+
+	./configure
+	make
+
+This compiles the following programs:
+
+	tempest_am_X11
+	tempest_am_svga
+
+
+Running the program
+===================
+
+Running Tempest-AM is very simple. However, you need to provide some 
+information for the program before you can succesfully test the program.
+
+Command line options:
+
+-r <clock>	Resolution clock rate (from XF86Config)
+-h <htotal>	Resolution horizontal total timing (from XF86Config)
+-v <vtotal>	Resolution vertical total timing (from XF86Config)
+-t <tone>	Tone frequency to be broadcasted (Hz)
+-c <carrier>	Carrier frequency (Hz)
+-s <w h>	Window size (eg. 1152 864) (default: 1024x768)
+-q		Use square waves
+-p		Generate PGM picture of the signal
+-V		Displays help and version
+
+and one additional option on SVGA lib version of the program:
+
+-n <resolution>	SVGA library resolution number
+
+
+Example:
+
+Get your current resolution information from your XF86Config. I use
+here my own settings as an example.
+
+Modeline "1152x864"	135 
+			1152 1464 1592 1776
+			864 864 876 908
+
+Information for the options are (man XF86Config for more info):
+
+<clock> = 135
+<htotal> = 1776
+<vtotal> = 908
+
+I select 1000 Hz as tone and 12 MHz as carrier. And I want it to
+fill the entire screen:
+
+./tempest_am_X11 -r 135 -h 1776 -v 908 -t 1000 -c 12000000 -s 1152 864
+
+This causes my monitor to transmit 1000 Hz tone on 12 Mhz. The entire 
+screen (resolution is 1152x864) is filled with the pattern. The screen
+don't have to be as large as the resolution is but the fact is that the
+signal is stronger when larger area of the screen is filled.
+
+If you want to save the signal into a picture file then use -p option
+and direct the output to a file. The program generates PGM picture which
+generally can be viewed with any picture viewer; xv, kview, etc.
+
+
+Using Tempest-AM
+================
+
+This section briefly covers how to test the program. You, of course, need
+a proper radio receiver to test it. Probably the best choice is a cheap
+handheld radio. The downside is that it probably has a very poor antenna
+so you probably cannot receive the signal very afar from the monitor. But 
+still, it can be used to test the program. You also need a high resolution 
+monitor. If your video card and monitor can do resolution of 1024x768 and
+above, you should be fine. I told you before that 1024x768 is a minimum 
+but you certainly can try it on, say, 800x600, it just might work!
+
+I succesfully tested the program in the same room where the monitor was
+and all nearby rooms when I was near power lines (inside wall). As expected
+the signal was strongest when I was very near the monitor and near power
+lines. However, I had very poor antenna so with better antenna and maybe 
+with band-pass filter, the  signal would've been heard a lot farer away. 
+To test the program select the carrier frequency that should broadcast 
+the tone and you should hear it. If your carrier is 12 Mhz the tone 
+should be found very near that. I switched the frequency between 800 Hz 
+and 1100 Hz so I could be certain that I found the right carrier. The 
+tone is like a beeeeep sound so it is easy to recognize. And, when you 
+terminate the program the beep sound should stop. This should give you 
+enough certainty that you've found the right carrier. 
+
+After this you can step away from the monitor and see how afar your can
+hear the tone. You can move around the antenna near power lines and put it
+parallel with power lines inside the wall. Move around and try from nearby
+rooms as well. You probably hear a lot noise on the background thus the 
+signal can be very weak. This is because of bad signal/noise ratio (SNR). 
+With band-pass filter you could filter the noise away and thus get a lot
+better SNR.
+
+Tempest-AM can use sine waves and square waves in the signal. By default 
+the program uses sine waves but generally square waves has a bit more 
+energy in them so it might be a good idea to use square waves when testing 
+the program.
+
+For the people who is familiar with playing music could test a couple 
+of special frequencies; C2 is = 523 Hz, C3 = 1047 Hz, C4 = 2094. It easy
+to create other notes as well. I'll give you here a short list of 
+frequencies for one octave (lowest notes on piano): 
+
+	note	frequency (Hz)
+	A0	110
+	A#0	117
+	B0	123
+	C0	131
+	C#0	139
+	D0	147
+	D#0	156
+	E0	165
+	F0	175
+	F#	185
+	G0	196
+	G#0	208
+
+There is a pattern in this: If you want for example A1 just double the A0
+and you'll get A1, respectively. If you'll want D(-1) just divide D0 to 
+get D(-1), respectively. And now to create playing monitor... :)
+
+
+More information on Tempest
+===========================
+
+Tempest and electromagnetic radiation is an interesting topic. There
+aren't very much public literature on this topic. Luckily, there are a
+few technical papers and web sites on the net that are a must read. 
+
+Papers to read:
+
+o Markus G. Kuhn's and Ross J. Anderson's, "Soft Tempest: Hidden Data
+  Transmission Using Electromagnetic Emanations"
+
+	http://www.cl.cam.ac.uk/~mgk25/ih98-tempest.pdf
+
+o Wim van Eck, "Electromagnetic Radiation from Video Display Units: An
+  Eavesdropping Risk?"
+
+	http://jya.com/emr.pdf
+
+o Christopher Seline, "Eavesdropping On the Electromagnetic Emanations of
+  Digital Equipment: The Laws of Canada, England and the United States"
+
+	http://www.eff.org/pub/Privacy/Security/tempest_legal.draft
+
+
+Here's a few links to start from:
+
+o Ros Anderson's website, is a good starting point and has links to 
+  go further.
+
+	http://www.cl.cam.ac.uk/users/rja14/#Tempest
+		
+o The Complete, Unofficial TEMPEST Information Page, a great site. A lot
+  of links to other websites and papers.
+
+	http://www.eskimo.com/~joelm/tempest.html
+
+
+Bugs
+====
+
+One big bug is that the X11 version of the program is painfully slow. I'll
+try to find faster routines later. However, you don't need to draw the
+pattern on the screen real time, you can use -p option and direct the output
+to a file and use that.
+
+There can be other bugs as well, I hope there isn't any in the calculation
+of the signal though. If you'll find a bug then please report it.
+
+
+Other Programs Using Tempest AM
+===============================
+
+I am aware of at least one program that uses the routines of the Tempest
+AM called Tempest for Eliza, which creator took my joke seriosly about
+creating playing monitor and made it happen. The Tempest for Eliza is
+available from: http://www.erikyyy.de/tempest/.  Any questions about
+this program should be sent to the author, not me.
+
+
+Acknowledgements
+================
+
+I had a trouble testing the program at one time and Markus Kuhn (the author
+of the reference paper) was kind enough set me straight on that. He was
+even more kinder when he sent his own program he used in testings for the 
+paper. Thank you! :)
+
+
+Feedback and comments
+=====================
+
+You can send me feedback, comments and bug reports regarding this program.
+I would like to hear if you succesfully tested the program. 
+
+				Pekka Riikonen <priikone@poseidon.pspt.fi>

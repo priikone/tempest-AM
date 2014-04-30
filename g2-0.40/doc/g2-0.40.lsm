@@ -1,0 +1,25 @@
+Begin3
+Title:          g2
+Version:        0.40
+Entered-date:   03FEB99
+Description:	g2 is an easy to use graphics library for 2D
+		graphical applications written in Ansi-C. g2
+		library	provides a comprehensive set of functions
+		for simultaneous generation of graphical output
+		on different types of devices. Following devices
+		are currently supported by g2: PostScript, X11,
+		GIF (using gd) and Win32 (xfig is in development).
+		g2 has C, Fortran and perl interface.
+Keywords:       library graphics visualization scientific
+Author:         ljubo@ap.univie.ac.at      (Ljubomir Milanovic)
+		wagner@iap.tuwien.ac.at    (Horst Wagner)
+Maintained-by:  milanovic@iap.tuwien.ac.at (Ljubomir Milanovic)
+		wagner@iap.tuwien.ac.at    (Horst Wagner)
+Primary-site:   sunsite.unc.edu /pub/Linux/libs/graphics/
+		102kB g2-0.30.tar.gz
+		1kB  g2-0.30.lsm
+Alternate-site: 
+Original-site:  http://www.ap.univie.ac.at/users/ljubo/g2/
+Platforms:      Unix, WindowsNT, VMS
+Copying-policy: GPL
+End

@@ -1,0 +1,68 @@
+Installation
+============
+
+LINUX
+-----
+
+Either install RPM packet with binaries, or compile as described in the
+UNIX section 
+
+UNIX 
+----
+
+1. Extract package with gzip -dc g2-xxxx.tar.gz | tar xvf - 
+
+2. Run './configure'
+
+3. Optionally run 'make depend'
+
+4. Run 'make' 
+
+5. Run 'make install' or copy libg2.a and g2.h, g2_X11.h, g2_GIF.h, and
+   g2_PS.h to the default locations for library and include files. 
+
+6. Optional: run 'make demo' to compile demo applications 
+
+
+WINDOWS NT
+----------
+
+1. Extract package: unzip 'g2-xxxx.zip' 
+
+2. MS Visual C++ users can build both library and demos with the supplied
+   project file: g2.xxx 
+   users of gcc or other commandline based compilers with make support
+   continue as in Unix example 
+
+
+VMS
+---
+
+1. set default to root of distribution directory
+
+2. type mms to build g2.olb library
+
+3. to compile demo files, set defualt to [.demo] and type mms
+
+4. to install: copy g2.olb and g2.h, g2_X11.h and g2_PS.h to install
+   directories
+
+
+GIF-SUPPORT
+-----------
+
+g2 needs to be linked to the free available gd library written by
+Thomas Boutell in order to create GIF files.  g2 is tested with
+version 1.3 of gd. gd is available at http://www.boutell.com/gd/ and
+at numerous mirror sites.  Use a ftp search
+(e.g. http://ftpsearch.ntnu.no/) and search for "gd1.3.tar.gz" to find
+your nearest mirror site.
+
+
+PERL SUPPORT
+------------
+1. build g2 library
+2. cd to g2_perl and run
+	perl Makefile.PL
+	make
+	make test
